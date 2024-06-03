@@ -1,0 +1,15 @@
+[
+	{
+		"given": [null, "a", "b", null, "c", null],
+		"cases": [
+			{
+				"expression": "[]",
+				"result": ["a", "b", "c"]
+			},
+			{
+				"expression": "[*]",
+				"result": ["a", "b", "c"]
+			}
+		]
+	}
+]

@@ -53,23 +53,6 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		return e.evaluate(node.Right, current, variables)
 	case *parser.ArrayNode:
 		return node.Value, nil
-	case *parser.AssertArrayNode:
-		child, err := e.evaluate(node.Child, current, variables)
-		if err != nil {
-			return nil, err
-		}
-
-		if isArray(child) {
-			return child, nil
-		}
-
-		return nil, nil
-	case parser.AssertArrayCurrentNode:
-		if isArray(current) {
-			return current, nil
-		}
-
-		return nil, nil
 	case *parser.AssertNumberNode:
 		child, err := e.evaluate(node.Child, current, variables)
 		if err != nil {
@@ -671,6 +654,15 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		return e.projectObject(left, node.Right, variables)
 	case *parser.ProjectObjectCurrentNode:
 		return e.projectObject(current, node.Child, variables)
+	case *parser.PruneArrayNode:
+		child, err := e.evaluate(node.Child, current, variables)
+		if err != nil {
+			return nil, err
+		}
+
+		return pruneArray(child), nil
+	case parser.PruneArrayCurrentNode:
+		return pruneArray(current), nil
 	case *parser.ReplaceNode:
 		arg1, err := e.evaluate(node.Arguments[0], current, variables)
 		if err != nil {

@@ -57,24 +57,6 @@ func (n *ArrayNode) String() string {
 	return "Array"
 }
 
-type AssertArrayNode struct {
-	Child Node
-}
-
-func (n *AssertArrayNode) String() string {
-	return "AssertArray"
-}
-
-func (n *AssertArrayNode) Walk(v Visitor) {
-	v.Visit(n.Child)
-}
-
-type AssertArrayCurrentNode struct{}
-
-func (n AssertArrayCurrentNode) String() string {
-	return "AssertArrayCurrent"
-}
-
 type AssertNumberNode struct {
 	Child Node
 }
@@ -906,6 +888,24 @@ func (n *ProjectObjectCurrentNode) String() string {
 
 func (n *ProjectObjectCurrentNode) Walk(v Visitor) {
 	v.Visit(n.Child)
+}
+
+type PruneArrayNode struct {
+	Child Node
+}
+
+func (n *PruneArrayNode) String() string {
+	return "PruneArray"
+}
+
+func (n *PruneArrayNode) Walk(v Visitor) {
+	v.Visit(n.Child)
+}
+
+type PruneArrayCurrentNode struct{}
+
+func (n PruneArrayCurrentNode) String() string {
+	return "PruneArrayCurrent"
 }
 
 type ReplaceNode struct {

@@ -95,7 +95,7 @@ func (p *parser) expression(prec int) (Node, error) {
 			}
 
 			if right == nil {
-				node = &AssertArrayNode{
+				node = &PruneArrayNode{
 					Child: node,
 				}
 			} else {
@@ -1643,7 +1643,7 @@ func (p *parser) primaryExpression() (Node, error) {
 		}
 
 		if child == nil {
-			node = AssertArrayCurrentNode{}
+			node = PruneArrayCurrentNode{}
 		} else {
 			node = &ProjectArrayCurrentNode{
 				Child: child,

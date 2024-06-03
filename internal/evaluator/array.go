@@ -537,14 +537,25 @@ func flatten(v any) any {
 	}
 
 	r := make([]any, 0, len(a))
-	for _, i := range a {
-		ia, ok := i.([]any)
+	for _, v := range a {
+		va, ok := v.([]any)
 		if ok {
-			r = append(r, ia...)
+			for _, i := range va {
+				if i == nil {
+					continue
+				}
+
+				r = append(r, i)
+			}
+
 			continue
 		}
 
-		r = append(r, i)
+		if v == nil {
+			continue
+		}
+
+		r = append(r, v)
 	}
 
 	return r
@@ -568,9 +579,37 @@ func index(v any, i int) any {
 	return a[i]
 }
 
-func isArray(v any) bool {
-	_, ok := v.([]any)
-	return ok
+func pruneArray(v any) any {
+	a, ok := v.([]any)
+	if !ok {
+		return nil
+	}
+
+	var n bool
+	var r []any
+	for i, va := range a {
+		if n {
+			if va != nil {
+				r = append(r, va)
+			}
+
+			continue
+		}
+
+		if va == nil {
+			if i > 0 {
+				r = append(r, a[:i]...)
+			}
+
+			n = true
+		}
+	}
+
+	if n {
+		return r
+	}
+
+	return a
 }
 
 func sortArray(v any) (any, error) {

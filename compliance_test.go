@@ -16,7 +16,17 @@ import (
 func TestCompliance(t *testing.T) {
 	t.Parallel()
 
-	dir := filepath.Join("testdata", "compliance")
+	complianceTest(t, "compliance")
+}
+
+func TestExtra(t *testing.T) {
+	t.Parallel()
+
+	complianceTest(t, "extra")
+}
+
+func complianceTest(t *testing.T, dir string) {
+	dir = filepath.Join("testdata", dir)
 	entries, err := os.ReadDir(dir)
 	if err != nil {
 		t.Fatalf("error reading compliance test directory: %v", err)
