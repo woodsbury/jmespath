@@ -9,6 +9,10 @@ import (
 )
 
 func abs(v any) (any, error) {
+	if f, ok := toFloat(v); ok {
+		return math.Abs(f), nil
+	}
+
 	d, ok := toDecimal(v)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -21,6 +25,20 @@ func abs(v any) (any, error) {
 }
 
 func add(x, y any) (any, error) {
+	if xf, yf, ok := toFloatPair(x, y); ok {
+		r := xf + yf
+
+		if math.IsInf(r, 0) {
+			return nil, ErrInfinity
+		}
+
+		if math.IsNaN(r) {
+			return nil, ErrNotANumber
+		}
+
+		return r, nil
+	}
+
 	xd, ok := toDecimal(x)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -90,6 +108,10 @@ func avg(v any) (any, error) {
 }
 
 func ceil(v any) (any, error) {
+	if f, ok := toFloat(v); ok {
+		return math.Ceil(f), nil
+	}
+
 	d, ok := toDecimal(v)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -102,6 +124,20 @@ func ceil(v any) (any, error) {
 }
 
 func divide(x, y any) (any, error) {
+	if xf, yf, ok := toFloatPair(x, y); ok {
+		r := xf / yf
+
+		if math.IsInf(r, 0) {
+			return nil, ErrInfinity
+		}
+
+		if math.IsNaN(r) {
+			return nil, ErrNotANumber
+		}
+
+		return r, nil
+	}
+
 	xd, ok := toDecimal(x)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -132,6 +168,10 @@ func divide(x, y any) (any, error) {
 }
 
 func floor(v any) (any, error) {
+	if f, ok := toFloat(v); ok {
+		return math.Floor(f), nil
+	}
+
 	d, ok := toDecimal(v)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -144,6 +184,20 @@ func floor(v any) (any, error) {
 }
 
 func integerDivide(x, y any) (any, error) {
+	if xf, yf, ok := toFloatPair(x, y); ok {
+		r := math.Floor(xf / yf)
+
+		if math.IsInf(r, 0) {
+			return nil, ErrInfinity
+		}
+
+		if math.IsNaN(r) {
+			return nil, ErrNotANumber
+		}
+
+		return r, nil
+	}
+
 	xd, ok := toDecimal(x)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -209,6 +263,20 @@ func isNumber(v any) bool {
 }
 
 func modulo(x, y any) (any, error) {
+	if xf, yf, ok := toFloatPair(x, y); ok {
+		r := math.Mod(xf, yf)
+
+		if math.IsInf(r, 0) {
+			return nil, ErrInfinity
+		}
+
+		if math.IsNaN(r) {
+			return nil, ErrNotANumber
+		}
+
+		return r, nil
+	}
+
 	xd, ok := toDecimal(x)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -239,6 +307,20 @@ func modulo(x, y any) (any, error) {
 }
 
 func multiply(x, y any) (any, error) {
+	if xf, yf, ok := toFloatPair(x, y); ok {
+		r := xf * yf
+
+		if math.IsInf(r, 0) {
+			return nil, ErrInfinity
+		}
+
+		if math.IsNaN(r) {
+			return nil, ErrNotANumber
+		}
+
+		return r, nil
+	}
+
 	xd, ok := toDecimal(x)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -269,6 +351,20 @@ func multiply(x, y any) (any, error) {
 }
 
 func subtract(x, y any) (any, error) {
+	if xf, yf, ok := toFloatPair(x, y); ok {
+		r := xf - yf
+
+		if math.IsInf(r, 0) {
+			return nil, ErrInfinity
+		}
+
+		if math.IsNaN(r) {
+			return nil, ErrNotANumber
+		}
+
+		return r, nil
+	}
+
 	xd, ok := toDecimal(x)
 	if !ok {
 		return nil, &InvalidTypeError{
@@ -369,6 +465,38 @@ func toDecimal(v any) (decimal128.Decimal, bool) {
 	}
 
 	return decimal128.Decimal{}, false
+}
+
+func toFloat(v any) (float64, bool) {
+	switch v := v.(type) {
+	case float32:
+		return float64(v), true
+	case float64:
+		return v, true
+	default:
+		return 0.0, false
+	}
+}
+
+func toFloatPair(x, y any) (float64, float64, bool) {
+	var xf float64
+	switch x := x.(type) {
+	case float32:
+		xf = float64(x)
+	case float64:
+		xf = x
+	default:
+		return 0.0, 0.0, false
+	}
+
+	switch y := y.(type) {
+	case float32:
+		return xf, float64(y), true
+	case float64:
+		return xf, y, true
+	default:
+		return 0.0, 0.0, false
+	}
 }
 
 func toInt(v any) (int, bool, bool) {

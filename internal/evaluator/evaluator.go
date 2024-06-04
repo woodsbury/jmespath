@@ -499,6 +499,10 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 			return nil, err
 		}
 
+		if f, ok := toFloat(child); ok {
+			return -f, nil
+		}
+
 		d, ok := toDecimal(child)
 		if !ok {
 			return nil, nil
