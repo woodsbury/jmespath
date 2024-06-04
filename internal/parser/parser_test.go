@@ -49,7 +49,10 @@ func TestParseStringLiteral(t *testing.T) {
 		{"'abc'", "abc"},
 		{"'\\''", "'"},
 		{"'\\'", "\\"},
+		{"'\\\\'", "\\"},
+		{"'\\'\\\\'", "'\\"},
 		{"'\\n'", "\\n"},
+		{"'\\r\\n'", "\\r\\n"},
 	}
 
 	for _, test := range tests {
@@ -71,4 +74,14 @@ func TestParseStringLiteral(t *testing.T) {
 			}
 		})
 	}
+}
+
+func FuzzParser(f *testing.F) {
+	f.Add("a[].b[?c == 'X'] | {x: join(', ', @)}")
+
+	f.Fuzz(func(t *testing.T, expression string) {
+		t.Parallel()
+
+		Parse(expression)
+	})
 }

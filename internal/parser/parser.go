@@ -2193,6 +2193,10 @@ func (p *parser) setCurrent(tok lexer.Token) {
 
 func parseJSONLiteral(s string) (Node, error) {
 	v := strings.ReplaceAll(s[1:len(s)-1], "\\`", "`")
+	if len(v) == 0 {
+		return nil, &invalidJSONLiteralError{s}
+	}
+
 	switch v[0] {
 	case '"':
 		var s string
@@ -2389,16 +2393,17 @@ func parseStringLiteral(s string) (Node, error) {
 			b.WriteByte(v[0])
 		}
 
-		i := strings.IndexByte(v[1:], '\\')
-		if i == -1 || i+1 == len(v[1:]) {
-			b.WriteString(v[1:])
+		v = v[1:]
+		i := strings.IndexByte(v, '\\')
+		if i == -1 || i+1 == len(v) {
+			b.WriteString(v)
 
 			return &StringNode{
 				Value: b.String(),
 			}, nil
 		}
 
-		b.WriteString(v[1:i])
+		b.WriteString(v[:i])
 		v = v[i+1:]
 	}
 }
