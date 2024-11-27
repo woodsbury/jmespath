@@ -6,16 +6,9 @@ import (
 )
 
 var (
+	errInvalidRune               = errors.New("invalid rune")
 	errUnexpectedEndOfExpression = errors.New("unexpected end of expression")
 )
-
-type invalidRuneError struct {
-	r rune
-}
-
-func (err *invalidRuneError) Error() string {
-	return "invalid rune " + strconv.QuoteRune(err.r)
-}
 
 type unexpectedRuneError struct {
 	r rune

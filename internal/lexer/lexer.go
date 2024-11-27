@@ -1,8 +1,6 @@
 package lexer
 
-import (
-	"unicode/utf8"
-)
+import "unicode/utf8"
 
 type Lexer struct {
 	expression string
@@ -402,7 +400,7 @@ func (l *Lexer) decodeRune(pos int) (rune, int, error) {
 	}
 
 	if r == utf8.RuneError {
-		return r, sz, &invalidRuneError{r}
+		return r, sz, errInvalidRune
 	}
 
 	return r, sz, nil
