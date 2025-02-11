@@ -50,7 +50,7 @@ func add(x, y any) (any, error) {
 	yd, ok := toDecimal(y)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(x),
+			got:  reflect.TypeOf(y),
 			want: "number",
 		}
 	}
@@ -149,7 +149,7 @@ func divide(x, y any) (any, error) {
 	yd, ok := toDecimal(y)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(x),
+			got:  reflect.TypeOf(y),
 			want: "number",
 		}
 	}
@@ -209,7 +209,7 @@ func integerDivide(x, y any) (any, error) {
 	yd, ok := toDecimal(y)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(x),
+			got:  reflect.TypeOf(y),
 			want: "number",
 		}
 	}
@@ -288,7 +288,7 @@ func modulo(x, y any) (any, error) {
 	yd, ok := toDecimal(y)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(x),
+			got:  reflect.TypeOf(y),
 			want: "number",
 		}
 	}
@@ -332,7 +332,7 @@ func multiply(x, y any) (any, error) {
 	yd, ok := toDecimal(y)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(x),
+			got:  reflect.TypeOf(y),
 			want: "number",
 		}
 	}
@@ -376,7 +376,7 @@ func subtract(x, y any) (any, error) {
 	yd, ok := toDecimal(y)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(x),
+			got:  reflect.TypeOf(y),
 			want: "number",
 		}
 	}
