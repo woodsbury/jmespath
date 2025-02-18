@@ -27,7 +27,7 @@ func BenchmarkLexerNext(b *testing.B) {
 
 	expression := "a[].b[?c == 'X'] | {x: join(', ', @)}"
 
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		lex := NewLexer(expression)
 		for {
 			var tok Token

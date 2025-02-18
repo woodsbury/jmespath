@@ -85,3 +85,13 @@ func FuzzParser(f *testing.F) {
 		Parse(expression)
 	})
 }
+
+func BenchmarkParse(b *testing.B) {
+	b.ReportAllocs()
+
+	expression := "a[].b[?c == 'X'] | {x: join(', ', @)}"
+
+	for b.Loop() {
+		Parse(expression)
+	}
+}
