@@ -636,6 +636,13 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		}
 
 		return e.evaluate(node.Right, left, variables)
+	case *parser.PipeFieldNode:
+		left, err := e.evaluate(node.Left, current, variables)
+		if err != nil {
+			return nil, err
+		}
+
+		return field(node.Right, left), nil
 	case *parser.ProjectArrayNode:
 		left, err := e.evaluate(node.Left, current, variables)
 		if err != nil {

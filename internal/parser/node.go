@@ -838,6 +838,19 @@ func (n *PipeNode) Walk(v Visitor) {
 	v.Visit(n.Right)
 }
 
+type PipeFieldNode struct {
+	Left  Node
+	Right string
+}
+
+func (n *PipeFieldNode) String() string {
+	return "PipeField: " + n.Right
+}
+
+func (n *PipeFieldNode) Walk(v Visitor) {
+	v.Visit(n.Left)
+}
+
 type ProjectArrayNode struct {
 	Left  Node
 	Right Node

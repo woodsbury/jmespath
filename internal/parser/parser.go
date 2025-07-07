@@ -162,25 +162,79 @@ func (p *parser) expression(prec int) (Node, error) {
 				if err != nil {
 					return nil, err
 				}
-			case lexer.QuotedIdentifierToken, lexer.UnquotedIdentifierToken:
+			case lexer.QuotedIdentifierToken:
 				if err := p.advance(); err != nil {
 					return nil, err
 				}
 
-				right, err := p.expression(newPrec)
-				if err != nil {
-					return nil, err
-				}
-
 				if isProjectNode(node) {
+					right, err := p.expression(newPrec)
+					if err != nil {
+						return nil, err
+					}
+
 					node = &ProjectArrayNode{
 						Left:  node,
 						Right: right,
 					}
-				} else {
+				} else if precedence(p.next.Type) > newPrec {
+					right, err := p.expression(newPrec)
+					if err != nil {
+						return nil, err
+					}
+
 					node = &PipeNode{
 						Left:  node,
 						Right: right,
+					}
+				} else {
+					right, err := parseQuotedIdentifier(p.curr.Value)
+					if err != nil {
+						return nil, err
+					}
+
+					node = &PipeFieldNode{
+						Left:  node,
+						Right: right,
+					}
+
+					if err := p.advance(); err != nil {
+						return nil, err
+					}
+				}
+			case lexer.UnquotedIdentifierToken:
+				if err := p.advance(); err != nil {
+					return nil, err
+				}
+
+				if isProjectNode(node) {
+					right, err := p.expression(newPrec)
+					if err != nil {
+						return nil, err
+					}
+
+					node = &ProjectArrayNode{
+						Left:  node,
+						Right: right,
+					}
+				} else if p.next.Type == lexer.OpenParenToken || precedence(p.next.Type) > newPrec {
+					right, err := p.expression(newPrec)
+					if err != nil {
+						return nil, err
+					}
+
+					node = &PipeNode{
+						Left:  node,
+						Right: right,
+					}
+				} else {
+					node = &PipeFieldNode{
+						Left:  node,
+						Right: p.curr.Value,
+					}
+
+					if err := p.advance(); err != nil {
+						return nil, err
 					}
 				}
 			default:
