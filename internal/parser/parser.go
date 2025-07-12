@@ -2272,6 +2272,10 @@ func parseJSONLiteral(s string) (Node, error) {
 				Value: false,
 			}, nil
 		}
+	case 'n':
+		if v == "null" {
+			return NullNode{}, nil
+		}
 	case 't':
 		if v == "true" {
 			return BoolNode{
