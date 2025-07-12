@@ -708,6 +708,22 @@ func (n *NotNullNode) Walk(v Visitor) {
 	}
 }
 
+type NotNullValueNode struct {
+	Argument Node
+	Value    any
+}
+
+func (n *NotNullValueNode) String() string {
+	switch value := n.Value.(type) {
+	case json.Number:
+		return "NotNullValue: " + value.String()
+	case string:
+		return "NotNullValue: " + value
+	default:
+		return "NotNullValue"
+	}
+}
+
 type NullNode struct{}
 
 func (n NullNode) String() string {

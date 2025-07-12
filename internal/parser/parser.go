@@ -734,14 +734,7 @@ func (p *parser) function() (Node, error) {
 			Arguments: [2]Node{arg1, arg2},
 		}, nil
 	case "not_null":
-		args, err := p.functionVarArg(name)
-		if err != nil {
-			return nil, err
-		}
-
-		return &NotNullNode{
-			Arguments: args,
-		}, nil
+		return p.functionNotNull()
 	case "pad_left":
 		arg1, arg2, arg3, err := p.function2To3Arg(name)
 		if err != nil {
@@ -1396,6 +1389,99 @@ func (p *parser) function3To4Arg(name string) (Node, Node, Node, Node, error) {
 	return arg1, arg2, arg3, arg4, nil
 }
 
+func (p *parser) functionNotNull() (Node, error) {
+	if p.curr.Type == lexer.CloseParenToken {
+		return nil, &InvalidFunctionCallError{"not_null"}
+	}
+
+	node, err := p.expression(1)
+	if err != nil {
+		return nil, err
+	}
+
+	if p.curr.Type == lexer.CloseParenToken {
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		return &NotNullValueNode{
+			Argument: node,
+			Value:    nil,
+		}, nil
+	}
+
+	if p.curr.Type != lexer.CommaToken {
+		return nil, &unexpectedTokenError{p.curr.Value}
+	}
+
+	if err := p.advance(); err != nil {
+		return nil, err
+	}
+
+	if p.next.Type == lexer.CloseParenToken {
+		switch p.curr.Type {
+		case lexer.JSONLiteralToken:
+			value, err := parseJSONLiteral(p.curr.Value)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := p.advance2(); err != nil {
+				return nil, err
+			}
+
+			return &NotNullValueNode{
+				Argument: node,
+				Value:    value,
+			}, nil
+		case lexer.StringLiteralToken:
+			value, err := parseStringLiteral(p.curr.Value)
+			if err != nil {
+				return nil, err
+			}
+
+			if err := p.advance2(); err != nil {
+				return nil, err
+			}
+
+			return &NotNullValueNode{
+				Argument: node,
+				Value:    value,
+			}, nil
+		}
+	}
+
+	nodes := []Node{node}
+	for {
+		node, err := p.expression(1)
+		if err != nil {
+			return nil, err
+		}
+
+		nodes = append(nodes, node)
+
+		if p.curr.Type == lexer.CommaToken {
+			if err := p.advance(); err != nil {
+				return nil, err
+			}
+
+			continue
+		}
+
+		if p.curr.Type == lexer.CloseParenToken {
+			if err := p.advance(); err != nil {
+				return nil, err
+			}
+
+			return &NotNullNode{
+				Arguments: nodes,
+			}, nil
+		}
+
+		return nil, &unexpectedTokenError{p.curr.Value}
+	}
+}
+
 func (p *parser) functionVarArg(name string) ([]Node, error) {
 	if p.curr.Type == lexer.CloseParenToken {
 		return nil, &InvalidFunctionCallError{name}
@@ -1769,9 +1855,22 @@ func (p *parser) primaryExpression() (Node, error) {
 			}
 		}
 	case lexer.JSONLiteralToken:
-		node, err = parseJSONLiteral(p.curr.Value)
+		value, err := parseJSONLiteral(p.curr.Value)
 		if err != nil {
 			return nil, err
+		}
+
+		switch value := value.(type) {
+		case bool:
+			node = BoolNode{
+				Value: value,
+			}
+		case nil:
+			node = NullNode{}
+		default:
+			node = &ValueNode{
+				Value: value,
+			}
 		}
 
 		if err := p.advance(); err != nil {
@@ -1876,9 +1975,13 @@ func (p *parser) primaryExpression() (Node, error) {
 			return nil, err
 		}
 	case lexer.StringLiteralToken:
-		node, err = parseStringLiteral(p.curr.Value)
+		value, err := parseStringLiteral(p.curr.Value)
 		if err != nil {
 			return nil, err
+		}
+
+		node = &ValueNode{
+			Value: value,
 		}
 
 		if err := p.advance(); err != nil {
@@ -2245,7 +2348,7 @@ func (p *parser) setCurrent(tok lexer.Token) {
 	p.curr = tok
 }
 
-func parseJSONLiteral(s string) (Node, error) {
+func parseJSONLiteral(s string) (any, error) {
 	v := strings.ReplaceAll(s[1:len(s)-1], "\\`", "`")
 	if len(v) == 0 {
 		return nil, &invalidJSONLiteralError{s}
@@ -2255,32 +2358,24 @@ func parseJSONLiteral(s string) (Node, error) {
 	case '"':
 		var s string
 		if err := json.Unmarshal([]byte(v), &s); err == nil {
-			return &ValueNode{
-				Value: s,
-			}, nil
+			return s, nil
 		}
 	case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		var n json.Number
 		if err := json.Unmarshal([]byte(v), &n); err == nil {
-			return &ValueNode{
-				Value: n,
-			}, nil
+			return n, nil
 		}
 	case 'f':
 		if v == "false" {
-			return BoolNode{
-				Value: false,
-			}, nil
+			return false, nil
 		}
 	case 'n':
 		if v == "null" {
-			return NullNode{}, nil
+			return nil, nil
 		}
 	case 't':
 		if v == "true" {
-			return BoolNode{
-				Value: true,
-			}, nil
+			return true, nil
 		}
 	}
 
@@ -2297,9 +2392,7 @@ func parseJSONLiteral(s string) (Node, error) {
 		return nil, &invalidJSONLiteralError{s}
 	}
 
-	return &ValueNode{
-		Value: a,
-	}, nil
+	return a, nil
 }
 
 func parseQuotedIdentifier(s string) (string, error) {
@@ -2403,13 +2496,11 @@ func parseQuotedIdentifier(s string) (string, error) {
 	}
 }
 
-func parseStringLiteral(s string) (Node, error) {
+func parseStringLiteral(s string) (string, error) {
 	v := s[1 : len(s)-1]
 	i := strings.IndexByte(v, '\\')
 	if i == -1 || i+1 == len(v) {
-		return &ValueNode{
-			Value: v,
-		}, nil
+		return v, nil
 	}
 
 	var b strings.Builder
@@ -2433,9 +2524,7 @@ func parseStringLiteral(s string) (Node, error) {
 		if i == -1 || i+1 == len(v) {
 			b.WriteString(v)
 
-			return &ValueNode{
-				Value: b.String(),
-			}, nil
+			return b.String(), nil
 		}
 
 		b.WriteString(v[:i])

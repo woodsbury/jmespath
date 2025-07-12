@@ -543,6 +543,17 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		}
 
 		return nil, nil
+	case *parser.NotNullValueNode:
+		result, err := e.evaluate(node.Argument, current, variables)
+		if err != nil {
+			return nil, err
+		}
+
+		if result != nil {
+			return result, nil
+		}
+
+		return nil, nil
 	case parser.NullNode:
 		return nil, nil
 	case *parser.ObjectValuesNode:
