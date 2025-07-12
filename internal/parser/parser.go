@@ -2254,15 +2254,15 @@ func parseJSONLiteral(s string) (Node, error) {
 	switch v[0] {
 	case '"':
 		var s string
-		if err := json.Unmarshal([]byte(v), &s); err != nil {
-			return &StringNode{
+		if err := json.Unmarshal([]byte(v), &s); err == nil {
+			return &ValueNode{
 				Value: s,
 			}, nil
 		}
 	case '-', '0', '1', '2', '3', '4', '5', '6', '7', '8', '9':
 		var n json.Number
 		if err := json.Unmarshal([]byte(v), &n); err == nil {
-			return &NumberNode{
+			return &ValueNode{
 				Value: n,
 			}, nil
 		}
@@ -2293,32 +2293,9 @@ func parseJSONLiteral(s string) (Node, error) {
 		return nil, &invalidJSONLiteralError{s}
 	}
 
-	switch a := a.(type) {
-	case []any:
-		return &ArrayNode{
-			Value: a,
-		}, nil
-	case bool:
-		return BoolNode{
-			Value: a,
-		}, nil
-	case map[string]any:
-		return &ObjectNode{
-			Value: a,
-		}, nil
-	case json.Number:
-		return &NumberNode{
-			Value: a,
-		}, nil
-	case nil:
-		return NullNode{}, nil
-	case string:
-		return &StringNode{
-			Value: a,
-		}, nil
-	default:
-		return nil, &invalidJSONLiteralError{s}
-	}
+	return &ValueNode{
+		Value: a,
+	}, nil
 }
 
 func parseQuotedIdentifier(s string) (string, error) {
@@ -2426,7 +2403,7 @@ func parseStringLiteral(s string) (Node, error) {
 	v := s[1 : len(s)-1]
 	i := strings.IndexByte(v, '\\')
 	if i == -1 || i+1 == len(v) {
-		return &StringNode{
+		return &ValueNode{
 			Value: v,
 		}, nil
 	}
@@ -2452,7 +2429,7 @@ func parseStringLiteral(s string) (Node, error) {
 		if i == -1 || i+1 == len(v) {
 			b.WriteString(v)
 
-			return &StringNode{
+			return &ValueNode{
 				Value: b.String(),
 			}, nil
 		}

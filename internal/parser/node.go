@@ -49,14 +49,6 @@ func (n *AndNode) Walk(v Visitor) {
 	v.Visit(n.Right)
 }
 
-type ArrayNode struct {
-	Value []any
-}
-
-func (n *ArrayNode) String() string {
-	return "Array"
-}
-
 type AssertNumberNode struct {
 	Child Node
 }
@@ -722,22 +714,6 @@ func (n NullNode) String() string {
 	return "Null"
 }
 
-type NumberNode struct {
-	Value json.Number
-}
-
-func (n *NumberNode) String() string {
-	return "Number: " + n.Value.String()
-}
-
-type ObjectNode struct {
-	Value map[string]any
-}
-
-func (n *ObjectNode) String() string {
-	return "Object"
-}
-
 type ObjectValuesNode struct {
 	Child Node
 }
@@ -1205,14 +1181,6 @@ func (n *StartsWithNode) Walk(v Visitor) {
 	v.Visit(n.Arguments[1])
 }
 
-type StringNode struct {
-	Value string
-}
-
-func (n *StringNode) String() string {
-	return "String: " + n.Value
-}
-
 type SubtractNode struct {
 	Left  Node
 	Right Node
@@ -1372,6 +1340,21 @@ func (n *UpperNode) String() string {
 
 func (n *UpperNode) Walk(v Visitor) {
 	v.Visit(n.Argument)
+}
+
+type ValueNode struct {
+	Value any
+}
+
+func (n *ValueNode) String() string {
+	switch value := n.Value.(type) {
+	case json.Number:
+		return "Value: " + value.String()
+	case string:
+		return "Value: " + value
+	default:
+		return "Value"
+	}
 }
 
 type ValuesNode struct {

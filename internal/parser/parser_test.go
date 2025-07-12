@@ -64,13 +64,18 @@ func TestParseStringLiteral(t *testing.T) {
 				t.Fatalf("parseStringLiteral(%s) = %v, want <nil>", test.value, err)
 			}
 
-			stringNode, ok := node.(*StringNode)
+			valueNode, ok := node.(*ValueNode)
 			if !ok {
-				t.Fatalf("parseStringLiteral(%s) = %T, want *StringNode", test.value, node)
+				t.Fatalf("parseStringLiteral(%s) = %T, want *ValueNode", test.value, node)
 			}
 
-			if stringNode.Value != test.result {
-				t.Fatalf("parseStringLiteral(%s) = %s, want %s", test.value, stringNode.Value, test.result)
+			stringValue, ok := valueNode.Value.(string)
+			if !ok {
+				t.Fatalf("parseStringLiteral(%s) = %v, want %s", test.value, valueNode.Value, test.result)
+			}
+
+			if stringValue != test.result {
+				t.Fatalf("parseStringLiteral(%s) = %s, want %s", test.value, stringValue, test.result)
 			}
 		})
 	}

@@ -51,8 +51,6 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		}
 
 		return e.evaluate(node.Right, current, variables)
-	case *parser.ArrayNode:
-		return node.Value, nil
 	case *parser.AssertNumberNode:
 		child, err := e.evaluate(node.Child, current, variables)
 		if err != nil {
@@ -547,10 +545,6 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		return nil, nil
 	case parser.NullNode:
 		return nil, nil
-	case *parser.NumberNode:
-		return node.Value, nil
-	case *parser.ObjectNode:
-		return node.Value, nil
 	case *parser.ObjectValuesNode:
 		child, err := e.evaluate(node.Child, current, variables)
 		if err != nil {
@@ -921,8 +915,6 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		}
 
 		return startsWith(arg1, arg2)
-	case *parser.StringNode:
-		return node.Value, nil
 	case *parser.SubtractNode:
 		left, err := e.evaluate(node.Left, current, variables)
 		if err != nil {
@@ -1034,6 +1026,8 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		}
 
 		return upper(arg)
+	case *parser.ValueNode:
+		return node.Value, nil
 	case *parser.ValuesNode:
 		arg, err := e.evaluate(node.Argument, current, variables)
 		if err != nil {
