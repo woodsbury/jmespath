@@ -11,5 +11,21 @@
 				"result": ["a", "b", "c"]
 			}
 		]
+	},
+	{
+		"given": {
+			"a": 1,
+			"b": null
+		},
+		"cases": [
+			{
+				"expression": "not_null(a, `0`) + `2`",
+				"result": 3
+			},
+			{
+				"expression": "not_null(b, `0`) + `2`",
+				"result": 2
+			}
+		]
 	}
 ]

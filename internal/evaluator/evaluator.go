@@ -553,7 +553,7 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 			return result, nil
 		}
 
-		return nil, nil
+		return node.Value, nil
 	case parser.NullNode:
 		return nil, nil
 	case *parser.ObjectValuesNode:
