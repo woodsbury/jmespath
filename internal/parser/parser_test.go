@@ -16,8 +16,6 @@ func TestParseJSONLiteral(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
-
 		t.Run(test.value, func(t *testing.T) {
 			result, err := parseJSONLiteral(test.value)
 			if err != nil || result != test.result {
@@ -47,8 +45,6 @@ func TestParseStringLiteral(t *testing.T) {
 	}
 
 	for _, test := range tests {
-		test := test
-
 		t.Run(test.value, func(t *testing.T) {
 			result, err := parseStringLiteral(test.value)
 			if err != nil || result != test.result {

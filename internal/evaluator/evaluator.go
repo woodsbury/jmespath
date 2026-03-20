@@ -1,6 +1,7 @@
 package evaluator
 
 import (
+	"maps"
 	"math"
 	"reflect"
 
@@ -447,9 +448,7 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 				}
 			}
 
-			for k, v := range m {
-				result[k] = v
-			}
+			maps.Copy(result, m)
 		}
 
 		return result, nil

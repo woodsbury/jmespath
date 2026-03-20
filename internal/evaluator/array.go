@@ -478,7 +478,7 @@ func arrayMin(v any) (any, error) {
 	a, ok := v.([]any)
 	if !ok {
 		return nil, &InvalidTypeError{
-			got:  reflect.TypeOf(a),
+			got:  reflect.TypeOf(v),
 			want: "array",
 		}
 	}
