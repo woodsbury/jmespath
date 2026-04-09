@@ -238,6 +238,14 @@ func (l *Lexer) Next(t *Token) error {
 		}
 
 		return nil
+	case '?':
+		l.position += sz
+		*t = Token{
+			Type:  IfToken,
+			Value: l.expression[start:l.position],
+		}
+
+		return nil
 	case '@':
 		l.position += sz
 		*t = Token{

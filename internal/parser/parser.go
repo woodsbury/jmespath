@@ -329,6 +329,34 @@ func (p *parser) expression(prec int) (Node, error) {
 				Left:  node,
 				Right: right,
 			}
+		case lexer.IfToken:
+			if err := p.advance(); err != nil {
+				return nil, err
+			}
+
+			ifThen, err := p.expression(1)
+			if err != nil {
+				return nil, err
+			}
+
+			if p.curr.Type != lexer.ColonToken {
+				return nil, &unexpectedTokenError{p.curr.Value}
+			}
+
+			if err := p.advance(); err != nil {
+				return nil, err
+			}
+
+			ifElse, err := p.expression(1)
+			if err != nil {
+				return nil, err
+			}
+
+			return &IfNode{
+				Condition: node,
+				Then:      ifThen,
+				Else:      ifElse,
+			}, nil
 		case lexer.IntegerDivideToken:
 			if err := p.advance(); err != nil {
 				return nil, err
@@ -1519,14 +1547,16 @@ func (p *parser) functionVarArg(name string) ([]Node, error) {
 func (p *parser) index(child Node) (Node, bool, error) {
 	var haveStart bool
 	start := 0
-	if p.curr.Type == lexer.IntegerLiteralToken {
+	switch p.curr.Type {
+	case lexer.IntegerLiteralToken:
 		var err error
 		start, err = strconv.Atoi(p.curr.Value)
 		if err != nil {
 			return nil, false, &invalidIndexError{p.curr.Value}
 		}
 
-		if p.next.Type == lexer.CloseSqBraceToken {
+		switch p.next.Type {
+		case lexer.CloseSqBraceToken:
 			if err := p.advance2(); err != nil {
 				return nil, false, err
 			}
@@ -1547,33 +1577,35 @@ func (p *parser) index(child Node) (Node, bool, error) {
 				Child: child,
 				Value: start,
 			}, false, nil
-		} else if p.next.Type == lexer.ColonToken {
+		case lexer.ColonToken:
 			if err := p.advance2(); err != nil {
 				return nil, false, err
 			}
-		} else {
+		default:
 			return nil, false, &unexpectedTokenError{p.next.Value}
 		}
 
 		haveStart = true
-	} else if p.curr.Type == lexer.ColonToken {
+	case lexer.ColonToken:
 		if err := p.advance(); err != nil {
 			return nil, false, err
 		}
-	} else {
+	default:
 		return nil, false, &unexpectedTokenError{p.curr.Value}
 	}
 
 	var haveStop bool
 	stop := math.MaxInt
-	if p.curr.Type == lexer.IntegerLiteralToken {
+	switch p.curr.Type {
+	case lexer.IntegerLiteralToken:
 		var err error
 		stop, err = strconv.Atoi(p.curr.Value)
 		if err != nil {
 			return nil, false, &invalidIndexError{p.curr.Value}
 		}
 
-		if p.next.Type == lexer.CloseSqBraceToken {
+		switch p.next.Type {
+		case lexer.CloseSqBraceToken:
 			if err := p.advance2(); err != nil {
 				return nil, false, err
 			}
@@ -1590,16 +1622,16 @@ func (p *parser) index(child Node) (Node, bool, error) {
 				Start: start,
 				Stop:  stop,
 			}, true, nil
-		} else if p.next.Type == lexer.ColonToken {
+		case lexer.ColonToken:
 			if err := p.advance2(); err != nil {
 				return nil, false, err
 			}
-		} else {
+		default:
 			return nil, false, &unexpectedTokenError{p.next.Value}
 		}
 
 		haveStop = true
-	} else if p.curr.Type == lexer.CloseSqBraceToken {
+	case lexer.CloseSqBraceToken:
 		if err := p.advance(); err != nil {
 			return nil, false, err
 		}
@@ -1616,16 +1648,17 @@ func (p *parser) index(child Node) (Node, bool, error) {
 			Start: start,
 			Stop:  math.MaxInt,
 		}, true, nil
-	} else if p.curr.Type == lexer.ColonToken {
+	case lexer.ColonToken:
 		if err := p.advance(); err != nil {
 			return nil, false, err
 		}
-	} else {
+	default:
 		return nil, false, &unexpectedTokenError{p.curr.Value}
 	}
 
 	step := 1
-	if p.curr.Type == lexer.IntegerLiteralToken {
+	switch p.curr.Type {
+	case lexer.IntegerLiteralToken:
 		if p.next.Type != lexer.CloseSqBraceToken {
 			return nil, false, &unexpectedTokenError{p.next.Value}
 		}
@@ -1653,7 +1686,7 @@ func (p *parser) index(child Node) (Node, bool, error) {
 		if err := p.advance2(); err != nil {
 			return nil, false, err
 		}
-	} else if p.curr.Type == lexer.CloseSqBraceToken {
+	case lexer.CloseSqBraceToken:
 		if err := p.advance(); err != nil {
 			return nil, false, err
 		}

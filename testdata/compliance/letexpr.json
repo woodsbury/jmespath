@@ -243,5 +243,17 @@
     "error": "syntax"
    }
   ]
+ },
+ {
+   "given": {
+     "foo": "outer"
+   },
+   "cases": [
+     {
+       "comment": "Inner scope explicitly sets 'foo' to null, should not fall back to outer scope",
+       "expression": "let $foo = foo in let $foo = null in $foo",
+       "result": null
+     }
+   ]
  }
 ]

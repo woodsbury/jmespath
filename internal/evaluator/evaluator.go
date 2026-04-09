@@ -326,6 +326,17 @@ func (e *evaluator) evaluate(node parser.Node, current any, variables *variableS
 		}
 
 		return e.groupBy(arg1, node.Arguments[1], variables)
+	case *parser.IfNode:
+		condition, err := e.evaluate(node.Condition, current, variables)
+		if err != nil {
+			return nil, err
+		}
+
+		if isTrue(condition) {
+			return e.evaluate(node.Then, current, variables)
+		}
+
+		return e.evaluate(node.Else, current, variables)
 	case *parser.IndexNode:
 		child, err := e.evaluate(node.Child, current, variables)
 		if err != nil {

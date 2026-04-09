@@ -427,6 +427,22 @@ func (n *GroupByNode) Walk(v Visitor) {
 	v.Visit(n.Arguments[1])
 }
 
+type IfNode struct {
+	Condition Node
+	Then      Node
+	Else      Node
+}
+
+func (n *IfNode) String() string {
+	return "If"
+}
+
+func (n *IfNode) Walk(v Visitor) {
+	v.Visit(n.Condition)
+	v.Visit(n.Then)
+	v.Visit(n.Else)
+}
+
 type IndexNode struct {
 	Child Node
 	Value int

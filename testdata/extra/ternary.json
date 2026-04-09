@@ -1,0 +1,27 @@
+[
+	{
+		"given": {
+			"a": [true, false],
+			"b": 1,
+			"c": 2
+		},
+		"cases": [
+			{
+				"expression": "a | [0] ? `\"yes\"` : `\"no\"`",
+				"result": "yes"
+			},
+			{
+				"expression": "a | [1] ? `\"yes\"` : `\"no\"`",
+				"result": "no"
+			},
+			{
+				"expression": "a[0] ? b | @ : c | @",
+				"result": 1
+			},
+			{
+				"expression": "a[1] ? b | @ : c | @",
+				"result": 2
+			}
+		]
+	}
+]

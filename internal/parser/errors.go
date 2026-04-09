@@ -62,5 +62,9 @@ type unexpectedTokenError struct {
 }
 
 func (err *unexpectedTokenError) Error() string {
+	if err.s == "" {
+		return "unexpected end of expression"
+	}
+
 	return "unexpected token " + strconv.Quote(err.s)
 }

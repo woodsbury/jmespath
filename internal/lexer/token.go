@@ -25,9 +25,10 @@ const (
 	EqualToken
 	FilterToken
 	FlattenToken
-	InToken
 	GreaterToken
 	GreaterOrEqualToken
+	IfToken
+	InToken
 	IntegerDivideToken
 	LessToken
 	LessOrEqualToken
