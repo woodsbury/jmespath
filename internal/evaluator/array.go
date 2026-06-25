@@ -168,6 +168,10 @@ func (e *evaluator) filter(value any, node parser.Node, variables *variableScope
 
 	r := make([]any, 0, len(a))
 	for _, v := range a {
+		if v == nil {
+			continue
+		}
+
 		f, err := e.evaluate(node, v, variables)
 		if err != nil {
 			return nil, err

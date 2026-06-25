@@ -27,5 +27,36 @@
 				"result": 2
 			}
 		]
+	},
+	{
+		"given": {
+			"vals": [null, false, "", 0, "x"]
+		},
+		"cases": [
+			{
+				"expression": "vals[?!@]",
+				"result": [false, ""]
+			},
+			{
+				"expression": "to_string(vals[0])",
+				"result": "null"
+			},
+			{
+				"expression": "to_number(to_string(vals[0]))",
+				"result": null
+			},
+			{
+				"expression": "to_number(vals[3])",
+				"result": 0
+			},
+			{
+				"expression": "to_number(`\"null\"`)",
+				"result": null
+			},
+			{
+				"expression": "to_number(`\"a\"`)",
+				"result": null
+			}
+		]
 	}
 ]

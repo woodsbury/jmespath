@@ -92,6 +92,10 @@ func toNumber(v any) any {
 		uint:
 		return v
 	case string:
+		if v == "null" {
+			return nil
+		}
+
 		var d decimal128.Decimal
 		if err := d.UnmarshalJSON([]byte(v)); err != nil {
 			return nil
