@@ -1,0 +1,63 @@
+[
+	{
+		"given": {},
+		"cases": [
+			{
+				"expression": "`17` // `5`",
+				"result": 3
+			},
+			{
+				"expression": "`15` // `5`",
+				"result": 3
+			},
+			{
+				"expression": "`17` // -`5`",
+				"result": -4
+			},
+			{
+				"expression": "`15` // -`5`",
+				"result": -3
+			},
+			{
+				"expression": "`17` // `-5`",
+				"result": -4
+			},
+			{
+				"expression": "`15` // `-5`",
+				"result": -3
+			},
+			{
+				"expression": "-`17` // `5`",
+				"result": -3
+			},
+			{
+				"expression": "-`15` // `5`",
+				"result": -3
+			},
+			{
+				"expression": "`-17` // `5`",
+				"result": -4
+			},
+			{
+				"expression": "`-15` // `5`",
+				"result": -3
+			},
+			{
+				"expression": "-`17` // -`5`",
+				"result": 4
+			},
+			{
+				"expression": "-`15` // -`5`",
+				"result": 3
+			},
+			{
+				"expression": "`-17` // `-5`",
+				"result": 3
+			},
+			{
+				"expression": "`-15` // `-5`",
+				"result": 3
+			}
+		]
+	}
+]

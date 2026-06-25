@@ -214,7 +214,7 @@ func integerDivide(x, y any) (any, error) {
 		}
 	}
 
-	r, _ := xd.QuoRem(yd)
+	r := decimal128.Floor(xd.Quo(yd))
 
 	if r.IsInf(0) {
 		return nil, ErrInfinity
