@@ -2067,6 +2067,23 @@ func (p *parser) projection(prec int) (Node, error) {
 	var node Node
 	var err error
 	switch p.curr.Type {
+	case lexer.ArrayWildcardToken:
+		if err := p.advance(); err != nil {
+			return nil, err
+		}
+
+		child, err := p.projection(precedence(lexer.ObjectWildcardToken))
+		if err != nil {
+			return nil, err
+		}
+
+		if child == nil {
+			node = PruneArrayCurrentNode{}
+		} else {
+			node = &ProjectArrayCurrentNode{
+				Child: child,
+			}
+		}
 	case lexer.DotToken:
 		switch p.next.Type {
 		case lexer.ArrayWildcardToken:
@@ -2118,8 +2135,20 @@ func (p *parser) projection(prec int) (Node, error) {
 			return nil, err
 		}
 
-		node = &FilterCurrentNode{
-			Filter: filter,
+		child, err := p.projection(prec)
+		if err != nil {
+			return nil, err
+		}
+
+		if child == nil {
+			node = &FilterCurrentNode{
+				Filter: filter,
+			}
+		} else {
+			node = &FilterAndProjectCurrentNode{
+				Filter: filter,
+				Child:  child,
+			}
 		}
 	case lexer.ObjectWildcardToken:
 		if p.next.Type == lexer.EndToken {
@@ -2184,16 +2213,6 @@ func (p *parser) projection(prec int) (Node, error) {
 				if err != nil {
 					return nil, err
 				}
-			case lexer.QuotedIdentifierToken,
-				lexer.UnquotedIdentifierToken:
-				if err := p.advance(); err != nil {
-					return nil, err
-				}
-
-				node, err = p.expression(newPrec)
-				if err != nil {
-					return nil, err
-				}
 			default:
 				return nil, &unexpectedTokenError{p.curr.Value}
 			}
@@ -2207,9 +2226,22 @@ func (p *parser) projection(prec int) (Node, error) {
 				return nil, err
 			}
 
-			node = &FilterNode{
-				Child:  node,
-				Filter: filter,
+			right, err := p.projection(newPrec)
+			if err != nil {
+				return nil, err
+			}
+
+			if right == nil {
+				node = &FilterNode{
+					Child:  node,
+					Filter: filter,
+				}
+			} else {
+				node = &FilterAndProjectNode{
+					Left:   node,
+					Filter: filter,
+					Right:  right,
+				}
 			}
 		case lexer.ObjectWildcardToken:
 			if p.curr.Type == lexer.EndToken {

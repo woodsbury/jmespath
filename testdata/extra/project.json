@@ -1,0 +1,60 @@
+[
+	{
+		"given": {
+			"vals": [
+				[
+					{
+						"x": 1
+					},
+					{
+						"x": 2
+					}
+				],
+				[
+					{
+						"x": 3
+					}
+				]
+			]
+		},
+		"cases": [
+			{
+				"expression": "vals[*].x",
+				"result": []
+			},
+			{
+				"expression": "vals[*][*].x",
+				"result": [[1, 2], [3]]
+			},
+			{
+				"expression": "vals[*][*][*].x",
+				"result": [[], []]
+			}
+		]
+	},
+	{
+		"given": {
+			"vals": [
+				[
+					{
+						"x": 1
+					},
+					{
+						"x": 0
+					}
+				],
+				[
+					{
+						"x": 2
+					}
+				]
+			]
+		},
+		"cases": [
+			{
+				"expression": "vals[*][?x > `0`].x",
+				"result": [[1], [2]]
+			}
+		]
+	}
+]
