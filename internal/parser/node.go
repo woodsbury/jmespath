@@ -6,11 +6,16 @@ import (
 )
 
 type Node interface {
+	ResultTypes() Types
 	String() string
 }
 
 type AbsNode struct {
 	Argument Node
+}
+
+func (n *AbsNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *AbsNode) String() string {
@@ -24,6 +29,10 @@ func (n *AbsNode) Walk(v Visitor) {
 type AddNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *AddNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *AddNode) String() string {
@@ -40,6 +49,10 @@ type AndNode struct {
 	Right Node
 }
 
+func (n *AndNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *AndNode) String() string {
 	return "And"
 }
@@ -51,6 +64,10 @@ func (n *AndNode) Walk(v Visitor) {
 
 type AssertNumberNode struct {
 	Child Node
+}
+
+func (n *AssertNumberNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *AssertNumberNode) String() string {
@@ -65,6 +82,10 @@ type AvgNode struct {
 	Argument Node
 }
 
+func (n AvgNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *AvgNode) String() string {
 	return "Avg"
 }
@@ -77,12 +98,20 @@ type BoolNode struct {
 	Value bool
 }
 
+func (n BoolNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n BoolNode) String() string {
 	return "Bool: " + strconv.FormatBool(n.Value)
 }
 
 type CeilNode struct {
 	Argument Node
+}
+
+func (n *CeilNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *CeilNode) String() string {
@@ -97,6 +126,10 @@ type ContainsNode struct {
 	Arguments [2]Node
 }
 
+func (n *ContainsNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n *ContainsNode) String() string {
 	return "Contains"
 }
@@ -108,6 +141,10 @@ func (n *ContainsNode) Walk(v Visitor) {
 
 type CurrentNode struct{}
 
+func (n CurrentNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n CurrentNode) String() string {
 	return "Current"
 }
@@ -115,6 +152,10 @@ func (n CurrentNode) String() string {
 type DefineVariables struct {
 	Variables map[string]Node
 	Child     Node
+}
+
+func (n *DefineVariables) ResultTypes() Types {
+	return n.Child.ResultTypes()
 }
 
 func (n *DefineVariables) String() string {
@@ -134,6 +175,10 @@ type DivideNode struct {
 	Right Node
 }
 
+func (n *DivideNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *DivideNode) String() string {
 	return "Divide"
 }
@@ -145,6 +190,10 @@ func (n *DivideNode) Walk(v Visitor) {
 
 type EndsWithNode struct {
 	Arguments [2]Node
+}
+
+func (n *EndsWithNode) ResultTypes() Types {
+	return TypeBoolean
 }
 
 func (n *EndsWithNode) String() string {
@@ -161,6 +210,10 @@ type EqualNode struct {
 	Right Node
 }
 
+func (n *EqualNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n *EqualNode) String() string {
 	return "Equal"
 }
@@ -174,6 +227,10 @@ type FieldNode struct {
 	Value string
 }
 
+func (n *FieldNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *FieldNode) String() string {
 	return "Field: " + n.Value
 }
@@ -181,6 +238,10 @@ func (n *FieldNode) String() string {
 type FilterNode struct {
 	Child  Node
 	Filter Node
+}
+
+func (n *FilterNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *FilterNode) String() string {
@@ -198,6 +259,10 @@ type FilterAndProjectNode struct {
 	Right  Node
 }
 
+func (n *FilterAndProjectNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *FilterAndProjectNode) String() string {
 	return "FilterAndProject"
 }
@@ -213,6 +278,10 @@ type FilterAndProjectCurrentNode struct {
 	Child  Node
 }
 
+func (n *FilterAndProjectCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *FilterAndProjectCurrentNode) String() string {
 	return "FilterAndProjectCurrent"
 }
@@ -224,6 +293,10 @@ func (n *FilterAndProjectCurrentNode) Walk(v Visitor) {
 
 type FilterCurrentNode struct {
 	Filter Node
+}
+
+func (n *FilterCurrentNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *FilterCurrentNode) String() string {
@@ -238,6 +311,10 @@ type FindFirstNode struct {
 	Arguments [2]Node
 }
 
+func (n *FindFirstNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *FindFirstNode) String() string {
 	return "FindFirst"
 }
@@ -249,6 +326,10 @@ func (n *FindFirstNode) Walk(v Visitor) {
 
 type FindFirstBetweenNode struct {
 	Arguments [4]Node
+}
+
+func (n *FindFirstBetweenNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *FindFirstBetweenNode) String() string {
@@ -266,6 +347,10 @@ type FindFirstFromNode struct {
 	Arguments [3]Node
 }
 
+func (n *FindFirstFromNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *FindFirstFromNode) String() string {
 	return "FindFirstFrom"
 }
@@ -280,6 +365,10 @@ type FindLastNode struct {
 	Arguments [2]Node
 }
 
+func (n *FindLastNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *FindLastNode) String() string {
 	return "FindLast"
 }
@@ -291,6 +380,10 @@ func (n *FindLastNode) Walk(v Visitor) {
 
 type FindLastBetweenNode struct {
 	Arguments [4]Node
+}
+
+func (n *FindLastBetweenNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *FindLastBetweenNode) String() string {
@@ -308,6 +401,10 @@ type FindLastFromNode struct {
 	Arguments [3]Node
 }
 
+func (n *FindLastFromNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *FindLastFromNode) String() string {
 	return "FindLastFrom"
 }
@@ -320,6 +417,10 @@ func (n *FindLastFromNode) Walk(v Visitor) {
 
 type FlattenNode struct {
 	Child Node
+}
+
+func (n *FlattenNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *FlattenNode) String() string {
@@ -335,6 +436,10 @@ type FlattenAndProjectNode struct {
 	Right Node
 }
 
+func (n *FlattenAndProjectNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *FlattenAndProjectNode) String() string {
 	return "FlattenAndProject"
 }
@@ -348,6 +453,10 @@ type FlattenAndProjectCurrentNode struct {
 	Child Node
 }
 
+func (n *FlattenAndProjectCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *FlattenAndProjectCurrentNode) String() string {
 	return "FlattenAndProjectCurrent"
 }
@@ -358,12 +467,20 @@ func (n *FlattenAndProjectCurrentNode) Walk(v Visitor) {
 
 type FlattenCurrentNode struct{}
 
+func (n FlattenCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n FlattenCurrentNode) String() string {
 	return "FlattenCurrent"
 }
 
 type FloorNode struct {
 	Argument Node
+}
+
+func (n *FloorNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *FloorNode) String() string {
@@ -378,6 +495,10 @@ type FromItemsNode struct {
 	Argument Node
 }
 
+func (n *FromItemsNode) ResultTypes() Types {
+	return TypeObject
+}
+
 func (n *FromItemsNode) String() string {
 	return "FromItems"
 }
@@ -389,6 +510,10 @@ func (n *FromItemsNode) Walk(v Visitor) {
 type GreaterNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *GreaterNode) ResultTypes() Types {
+	return TypeBoolean
 }
 
 func (n *GreaterNode) String() string {
@@ -405,6 +530,10 @@ type GreaterOrEqualNode struct {
 	Right Node
 }
 
+func (n *GreaterOrEqualNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n *GreaterOrEqualNode) String() string {
 	return "GreaterOrEqual"
 }
@@ -416,6 +545,10 @@ func (n *GreaterOrEqualNode) Walk(v Visitor) {
 
 type GroupByNode struct {
 	Arguments [2]Node
+}
+
+func (n *GroupByNode) ResultTypes() Types {
+	return TypeObject
 }
 
 func (n *GroupByNode) String() string {
@@ -437,6 +570,10 @@ func (n *IfNode) String() string {
 	return "If"
 }
 
+func (n *IfNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *IfNode) Walk(v Visitor) {
 	v.Visit(n.Condition)
 	v.Visit(n.Then)
@@ -446,6 +583,10 @@ func (n *IfNode) Walk(v Visitor) {
 type IndexNode struct {
 	Child Node
 	Value int
+}
+
+func (n *IndexNode) ResultTypes() Types {
+	return TypeAny
 }
 
 func (n *IndexNode) String() string {
@@ -460,6 +601,10 @@ type IndexCurrentNode struct {
 	Value int
 }
 
+func (n IndexCurrentNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *IndexCurrentNode) String() string {
 	return "IndexCurrent: " + strconv.FormatInt(int64(n.Value), 10)
 }
@@ -467,6 +612,10 @@ func (n *IndexCurrentNode) String() string {
 type IntegerDivideNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *IntegerDivideNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *IntegerDivideNode) String() string {
@@ -482,6 +631,10 @@ type ItemsNode struct {
 	Argument Node
 }
 
+func (n *ItemsNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *ItemsNode) String() string {
 	return "Items"
 }
@@ -492,6 +645,10 @@ func (n *ItemsNode) Walk(v Visitor) {
 
 type JoinNode struct {
 	Arguments [2]Node
+}
+
+func (n *JoinNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *JoinNode) String() string {
@@ -507,6 +664,10 @@ type KeysNode struct {
 	Argument Node
 }
 
+func (n *KeysNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *KeysNode) String() string {
 	return "Keys"
 }
@@ -517,6 +678,10 @@ func (n *KeysNode) Walk(v Visitor) {
 
 type LengthNode struct {
 	Argument Node
+}
+
+func (n *LengthNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *LengthNode) String() string {
@@ -530,6 +695,10 @@ func (n *LengthNode) Walk(v Visitor) {
 type LessNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *LessNode) ResultTypes() Types {
+	return TypeBoolean
 }
 
 func (n *LessNode) String() string {
@@ -546,6 +715,10 @@ type LessOrEqualNode struct {
 	Right Node
 }
 
+func (n *LessOrEqualNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n *LessOrEqualNode) String() string {
 	return "LessOrEqual"
 }
@@ -559,6 +732,10 @@ type LowerNode struct {
 	Argument Node
 }
 
+func (n *LowerNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *LowerNode) String() string {
 	return "Lower"
 }
@@ -569,6 +746,10 @@ func (n *LowerNode) Walk(v Visitor) {
 
 type MapNode struct {
 	Arguments [2]Node
+}
+
+func (n *MapNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *MapNode) String() string {
@@ -584,6 +765,10 @@ type MaxNode struct {
 	Argument Node
 }
 
+func (n *MaxNode) ResultTypes() Types {
+	return TypeNumber | TypeString
+}
+
 func (n *MaxNode) String() string {
 	return "Max"
 }
@@ -594,6 +779,10 @@ func (n *MaxNode) Walk(v Visitor) {
 
 type MaxByNode struct {
 	Arguments [2]Node
+}
+
+func (n *MaxByNode) ResultTypes() Types {
+	return TypeAny
 }
 
 func (n *MaxByNode) String() string {
@@ -607,6 +796,10 @@ func (n *MaxByNode) Walk(v Visitor) {
 
 type MergeNode struct {
 	Arguments []Node
+}
+
+func (n *MergeNode) ResultTypes() Types {
+	return TypeObject
 }
 
 func (n *MergeNode) String() string {
@@ -623,6 +816,10 @@ type MinNode struct {
 	Argument Node
 }
 
+func (n *MinNode) ResultTypes() Types {
+	return TypeNumber | TypeString
+}
+
 func (n *MinNode) String() string {
 	return "Min"
 }
@@ -633,6 +830,10 @@ func (n *MinNode) Walk(v Visitor) {
 
 type MinByNode struct {
 	Arguments [2]Node
+}
+
+func (n *MinByNode) ResultTypes() Types {
+	return TypeAny
 }
 
 func (n *MinByNode) String() string {
@@ -649,6 +850,10 @@ type ModuloNode struct {
 	Right Node
 }
 
+func (n *ModuloNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *ModuloNode) String() string {
 	return "Modulo"
 }
@@ -661,6 +866,10 @@ func (n *ModuloNode) Walk(v Visitor) {
 type MultiplyNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *MultiplyNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *MultiplyNode) String() string {
@@ -676,6 +885,10 @@ type NegateNode struct {
 	Child Node
 }
 
+func (n *NegateNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *NegateNode) String() string {
 	return "Negate"
 }
@@ -686,6 +899,10 @@ func (n *NegateNode) Walk(v Visitor) {
 
 type NotNode struct {
 	Child Node
+}
+
+func (n *NotNode) ResultTypes() Types {
+	return TypeBoolean
 }
 
 func (n *NotNode) String() string {
@@ -701,6 +918,10 @@ type NotEqualNode struct {
 	Right Node
 }
 
+func (n *NotEqualNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n *NotEqualNode) String() string {
 	return "NotEqual"
 }
@@ -712,6 +933,10 @@ func (n *NotEqualNode) Walk(v Visitor) {
 
 type NotNullNode struct {
 	Arguments []Node
+}
+
+func (n *NotNullNode) ResultTypes() Types {
+	return TypeAny
 }
 
 func (n *NotNullNode) String() string {
@@ -729,6 +954,10 @@ type NotNullValueNode struct {
 	Value    any
 }
 
+func (n *NotNullValueNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *NotNullValueNode) String() string {
 	switch value := n.Value.(type) {
 	case json.Number:
@@ -742,12 +971,20 @@ func (n *NotNullValueNode) String() string {
 
 type NullNode struct{}
 
+func (n NullNode) ResultTypes() Types {
+	return TypeNull
+}
+
 func (n NullNode) String() string {
 	return "Null"
 }
 
 type ObjectValuesNode struct {
 	Child Node
+}
+
+func (n *ObjectValuesNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *ObjectValuesNode) String() string {
@@ -760,6 +997,10 @@ func (n *ObjectValuesNode) Walk(v Visitor) {
 
 type ObjectValuesCurrentNode struct{}
 
+func (n ObjectValuesCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n ObjectValuesCurrentNode) String() string {
 	return "ObjectValuesCurrent"
 }
@@ -767,6 +1008,10 @@ func (n ObjectValuesCurrentNode) String() string {
 type OrNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *OrNode) ResultTypes() Types {
+	return TypeAny
 }
 
 func (n *OrNode) String() string {
@@ -780,6 +1025,10 @@ func (n *OrNode) Walk(v Visitor) {
 
 type PadLeftNode struct {
 	Arguments [3]Node
+}
+
+func (n *PadLeftNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *PadLeftNode) String() string {
@@ -796,6 +1045,10 @@ type PadRightNode struct {
 	Arguments [3]Node
 }
 
+func (n *PadRightNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *PadRightNode) String() string {
 	return "PadRight"
 }
@@ -810,6 +1063,10 @@ type PadSpaceLeftNode struct {
 	Arguments [2]Node
 }
 
+func (n *PadSpaceLeftNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *PadSpaceLeftNode) String() string {
 	return "PadSpaceLeft"
 }
@@ -821,6 +1078,10 @@ func (n *PadSpaceLeftNode) Walk(v Visitor) {
 
 type PadSpaceRightNode struct {
 	Arguments [2]Node
+}
+
+func (n *PadSpaceRightNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *PadSpaceRightNode) String() string {
@@ -837,6 +1098,10 @@ type PipeNode struct {
 	Right Node
 }
 
+func (n *PipeNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *PipeNode) String() string {
 	return "Pipe"
 }
@@ -849,6 +1114,10 @@ func (n *PipeNode) Walk(v Visitor) {
 type PipeFieldNode struct {
 	Left  Node
 	Right string
+}
+
+func (n *PipeFieldNode) ResultTypes() Types {
+	return TypeAny
 }
 
 func (n *PipeFieldNode) String() string {
@@ -864,6 +1133,18 @@ type ProjectArrayNode struct {
 	Right Node
 }
 
+func (n *ProjectArrayNode) ResultTypes() Types {
+	switch n.Left.(type) {
+	case *SliceNode,
+		*SliceCurrentNode,
+		*SliceStepNode,
+		*SliceStepCurrentNode:
+		return TypeAny
+	}
+
+	return TypeArray
+}
+
 func (n *ProjectArrayNode) String() string {
 	return "ProjectArray"
 }
@@ -875,6 +1156,10 @@ func (n *ProjectArrayNode) Walk(v Visitor) {
 
 type ProjectArrayCurrentNode struct {
 	Child Node
+}
+
+func (n *ProjectArrayCurrentNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *ProjectArrayCurrentNode) String() string {
@@ -890,6 +1175,10 @@ type ProjectObjectNode struct {
 	Right Node
 }
 
+func (n *ProjectObjectNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *ProjectObjectNode) String() string {
 	return "ProjectObject"
 }
@@ -901,6 +1190,10 @@ func (n *ProjectObjectNode) Walk(v Visitor) {
 
 type ProjectObjectCurrentNode struct {
 	Child Node
+}
+
+func (n *ProjectObjectCurrentNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *ProjectObjectCurrentNode) String() string {
@@ -915,6 +1208,10 @@ type PruneArrayNode struct {
 	Child Node
 }
 
+func (n *PruneArrayNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *PruneArrayNode) String() string {
 	return "PruneArray"
 }
@@ -925,12 +1222,20 @@ func (n *PruneArrayNode) Walk(v Visitor) {
 
 type PruneArrayCurrentNode struct{}
 
+func (n PruneArrayCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n PruneArrayCurrentNode) String() string {
 	return "PruneArrayCurrent"
 }
 
 type ReplaceNode struct {
 	Arguments [3]Node
+}
+
+func (n *ReplaceNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *ReplaceNode) String() string {
@@ -945,6 +1250,10 @@ func (n *ReplaceNode) Walk(v Visitor) {
 
 type ReplaceCountNode struct {
 	Arguments [4]Node
+}
+
+func (n *ReplaceCountNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *ReplaceCountNode) String() string {
@@ -962,6 +1271,10 @@ type ReverseNode struct {
 	Argument Node
 }
 
+func (n *ReverseNode) ResultTypes() Types {
+	return TypeString | TypeArray
+}
+
 func (n *ReverseNode) String() string {
 	return "Reverse"
 }
@@ -972,6 +1285,10 @@ func (n *ReverseNode) Walk(v Visitor) {
 
 type RootNode struct{}
 
+func (n RootNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n RootNode) String() string {
 	return "Root"
 }
@@ -979,6 +1296,10 @@ func (n RootNode) String() string {
 type SelectArrayNode struct {
 	Child  Node
 	Fields []Node
+}
+
+func (n *SelectArrayNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *SelectArrayNode) String() string {
@@ -997,6 +1318,10 @@ type SelectArrayCurrentNode struct {
 	Fields []Node
 }
 
+func (n *SelectArrayCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *SelectArrayCurrentNode) String() string {
 	return "SelectArrayCurrent"
 }
@@ -1012,6 +1337,10 @@ type SelectArraySingleNode struct {
 	Field Node
 }
 
+func (n *SelectArraySingleNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *SelectArraySingleNode) String() string {
 	return "SelectArraySingle"
 }
@@ -1025,6 +1354,10 @@ type SelectArraySingleCurrentNode struct {
 	Field Node
 }
 
+func (n *SelectArraySingleCurrentNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *SelectArraySingleCurrentNode) String() string {
 	return "SelectArraySingleCurrent"
 }
@@ -1036,6 +1369,10 @@ func (n *SelectArraySingleCurrentNode) Walk(v Visitor) {
 type SelectObjectNode struct {
 	Child  Node
 	Fields map[string]Node
+}
+
+func (n *SelectObjectNode) ResultTypes() Types {
+	return TypeObject
 }
 
 func (n *SelectObjectNode) String() string {
@@ -1054,6 +1391,10 @@ type SelectObjectCurrentNode struct {
 	Fields map[string]Node
 }
 
+func (n *SelectObjectCurrentNode) ResultTypes() Types {
+	return TypeObject
+}
+
 func (n *SelectObjectCurrentNode) String() string {
 	return "SelectObjectCurrent"
 }
@@ -1070,6 +1411,10 @@ type SelectObjectSingleNode struct {
 	Field Node
 }
 
+func (n *SelectObjectSingleNode) ResultTypes() Types {
+	return TypeObject
+}
+
 func (n *SelectObjectSingleNode) String() string {
 	return "SelectObjectSingle"
 }
@@ -1082,6 +1427,10 @@ func (n *SelectObjectSingleNode) Walk(v Visitor) {
 type SelectObjectSingleCurrentNode struct {
 	Key   string
 	Field Node
+}
+
+func (n *SelectObjectSingleCurrentNode) ResultTypes() Types {
+	return TypeObject
 }
 
 func (n *SelectObjectSingleCurrentNode) String() string {
@@ -1098,6 +1447,10 @@ type SliceNode struct {
 	Stop  int
 }
 
+func (n *SliceNode) ResultTypes() Types {
+	return TypeString | TypeArray
+}
+
 func (n *SliceNode) String() string {
 	return "Slice: " + strconv.Itoa(n.Start) + ":" + strconv.Itoa(n.Stop)
 }
@@ -1111,6 +1464,10 @@ type SliceCurrentNode struct {
 	Stop  int
 }
 
+func (n *SliceCurrentNode) ResultTypes() Types {
+	return TypeString | TypeArray
+}
+
 func (n *SliceCurrentNode) String() string {
 	return "SliceCurrent: " + strconv.Itoa(n.Start) + ":" + strconv.Itoa(n.Stop)
 }
@@ -1120,6 +1477,10 @@ type SliceStepNode struct {
 	Start int
 	Stop  int
 	Step  int
+}
+
+func (n *SliceStepNode) ResultTypes() Types {
+	return TypeString | TypeArray
 }
 
 func (n *SliceStepNode) String() string {
@@ -1136,6 +1497,10 @@ type SliceStepCurrentNode struct {
 	Step  int
 }
 
+func (n *SliceStepCurrentNode) ResultTypes() Types {
+	return TypeString | TypeArray
+}
+
 func (n *SliceStepCurrentNode) String() string {
 	return "SliceStepCurrent: " + strconv.Itoa(n.Start) + ":" + strconv.Itoa(n.Stop) + ":" + strconv.Itoa(n.Step)
 }
@@ -1144,12 +1509,20 @@ type SmallIndexCurrentNode struct {
 	Value uint8
 }
 
+func (n SmallIndexCurrentNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n SmallIndexCurrentNode) String() string {
 	return "SmallIndexCurrent: " + strconv.FormatUint(uint64(n.Value), 10)
 }
 
 type SortNode struct {
 	Argument Node
+}
+
+func (n *SortNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *SortNode) String() string {
@@ -1162,6 +1535,10 @@ func (n *SortNode) Walk(v Visitor) {
 
 type SortByNode struct {
 	Arguments [2]Node
+}
+
+func (n *SortByNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *SortByNode) String() string {
@@ -1177,6 +1554,10 @@ type SplitNode struct {
 	Arguments [2]Node
 }
 
+func (n *SplitNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *SplitNode) String() string {
 	return "Split"
 }
@@ -1188,6 +1569,10 @@ func (n *SplitNode) Walk(v Visitor) {
 
 type SplitCountNode struct {
 	Arguments [3]Node
+}
+
+func (n *SplitCountNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *SplitCountNode) String() string {
@@ -1204,6 +1589,10 @@ type StartsWithNode struct {
 	Arguments [2]Node
 }
 
+func (n *StartsWithNode) ResultTypes() Types {
+	return TypeBoolean
+}
+
 func (n *StartsWithNode) String() string {
 	return "StartsWith"
 }
@@ -1216,6 +1605,10 @@ func (n *StartsWithNode) Walk(v Visitor) {
 type SubtractNode struct {
 	Left  Node
 	Right Node
+}
+
+func (n *SubtractNode) ResultTypes() Types {
+	return TypeNumber
 }
 
 func (n *SubtractNode) String() string {
@@ -1231,6 +1624,10 @@ type SumNode struct {
 	Argument Node
 }
 
+func (n *SumNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *SumNode) String() string {
 	return "Sum"
 }
@@ -1241,6 +1638,10 @@ func (n *SumNode) Walk(v Visitor) {
 
 type ToArrayNode struct {
 	Argument Node
+}
+
+func (n *ToArrayNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *ToArrayNode) String() string {
@@ -1255,6 +1656,10 @@ type ToNumberNode struct {
 	Argument Node
 }
 
+func (n *ToNumberNode) ResultTypes() Types {
+	return TypeNumber
+}
+
 func (n *ToNumberNode) String() string {
 	return "ToNumber"
 }
@@ -1267,6 +1672,10 @@ type ToStringNode struct {
 	Argument Node
 }
 
+func (n *ToStringNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *ToStringNode) String() string {
 	return "ToString"
 }
@@ -1277,6 +1686,10 @@ func (n *ToStringNode) Walk(v Visitor) {
 
 type TrimNode struct {
 	Arguments [2]Node
+}
+
+func (n *TrimNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *TrimNode) String() string {
@@ -1292,6 +1705,10 @@ type TrimLeftNode struct {
 	Arguments [2]Node
 }
 
+func (n *TrimLeftNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *TrimLeftNode) String() string {
 	return "TrimLeft"
 }
@@ -1303,6 +1720,10 @@ func (n *TrimLeftNode) Walk(v Visitor) {
 
 type TrimRightNode struct {
 	Arguments [2]Node
+}
+
+func (n *TrimRightNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *TrimRightNode) String() string {
@@ -1318,6 +1739,10 @@ type TrimSpaceNode struct {
 	Argument Node
 }
 
+func (n *TrimSpaceNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *TrimSpaceNode) String() string {
 	return "TrimSpace"
 }
@@ -1328,6 +1753,10 @@ func (n *TrimSpaceNode) Walk(v Visitor) {
 
 type TrimSpaceLeftNode struct {
 	Argument Node
+}
+
+func (n *TrimSpaceLeftNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *TrimSpaceLeftNode) String() string {
@@ -1342,6 +1771,10 @@ type TrimSpaceRightNode struct {
 	Argument Node
 }
 
+func (n *TrimSpaceRightNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *TrimSpaceRightNode) String() string {
 	return "TrimSpaceRight"
 }
@@ -1352,6 +1785,10 @@ func (n *TrimSpaceRightNode) Walk(v Visitor) {
 
 type TypeNode struct {
 	Argument Node
+}
+
+func (n *TypeNode) ResultTypes() Types {
+	return TypeString
 }
 
 func (n *TypeNode) String() string {
@@ -1366,6 +1803,10 @@ type UpperNode struct {
 	Argument Node
 }
 
+func (n *UpperNode) ResultTypes() Types {
+	return TypeString
+}
+
 func (n *UpperNode) String() string {
 	return "Upper"
 }
@@ -1376,6 +1817,21 @@ func (n *UpperNode) Walk(v Visitor) {
 
 type ValueNode struct {
 	Value any
+}
+
+func (n *ValueNode) ResultTypes() Types {
+	switch n.Value.(type) {
+	case []any:
+		return TypeArray
+	case map[string]any:
+		return TypeObject
+	case json.Number:
+		return TypeNumber
+	case string:
+		return TypeString
+	default:
+		return TypeAny
+	}
 }
 
 func (n *ValueNode) String() string {
@@ -1393,6 +1849,10 @@ type ValuesNode struct {
 	Argument Node
 }
 
+func (n *ValuesNode) ResultTypes() Types {
+	return TypeArray
+}
+
 func (n *ValuesNode) String() string {
 	return "Values"
 }
@@ -1405,12 +1865,20 @@ type VariableNode struct {
 	Name string
 }
 
+func (n *VariableNode) ResultTypes() Types {
+	return TypeAny
+}
+
 func (n *VariableNode) String() string {
 	return "Variable: " + n.Name
 }
 
 type ZipNode struct {
 	Arguments []Node
+}
+
+func (n *ZipNode) ResultTypes() Types {
+	return TypeArray
 }
 
 func (n *ZipNode) String() string {

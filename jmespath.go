@@ -8,6 +8,17 @@ import (
 	"github.com/woodsbury/jmespath/internal/parser"
 )
 
+// ResultTypes returns the potential types that the result of evaluating the
+// expression could have.
+func ResultTypes(expression string) (Types, error) {
+	node, err := parser.Parse(expression)
+	if err != nil {
+		return 0, parseError(expression, err)
+	}
+
+	return Types(node.ResultTypes()), nil
+}
+
 // Search evaluates expression with data and returns the result.
 func Search(expression string, data any) (any, error) {
 	node, err := parser.Parse(expression)
@@ -52,6 +63,12 @@ func MustCompile(expression string) *Expression {
 	return &Expression{
 		node: node,
 	}
+}
+
+// ResultTypes returns the potential types that the result of evaluating the
+// expression could have.
+func (e *Expression) ResultTypes() Types {
+	return Types(e.node.ResultTypes())
 }
 
 // Search evaluates the compiled expression against data and returns the

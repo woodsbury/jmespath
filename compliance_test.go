@@ -77,47 +77,10 @@ func complianceTest(t *testing.T, dir string) {
 						if test.Error != "" {
 							if err == nil {
 								t.Errorf("expected error %s from expression %q in compliance test file %s", test.Error, test.Expression, name)
+							} else if !errorEqual(test.Error, err) {
+								t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected: %s", err, test.Expression, name, test.Error)
 							} else {
-								switch test.Error {
-								case "invalid-arity":
-									if !errors.Is(err, ErrInvalidArity) {
-										t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected: %v", err, test.Expression, name, ErrInvalidArity)
-									} else {
-										pass.Add(1)
-									}
-								case "invalid-type":
-									if !errors.Is(err, ErrInvalidType) {
-										t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected: %v", err, test.Expression, name, ErrInvalidType)
-									} else {
-										pass.Add(1)
-									}
-								case "invalid-value":
-									if !errors.Is(err, ErrInvalidValue) {
-										t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected: %v", err, test.Expression, name, ErrInvalidValue)
-									} else {
-										pass.Add(1)
-									}
-								case "syntax":
-									if !errors.Is(err, ErrSyntax) {
-										t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected %v", err, test.Expression, name, ErrSyntax)
-									} else {
-										pass.Add(1)
-									}
-								case "undefined-variable":
-									if !errors.Is(err, ErrUndefinedVariable) {
-										t.Errorf("incorrect error %v from expressoin %q in compliance test file %s, expected %v", err, test.Expression, name, ErrUndefinedVariable)
-									} else {
-										pass.Add(1)
-									}
-								case "unknown-function":
-									if !errors.Is(err, ErrUnknownFunction) {
-										t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected %v", err, test.Expression, name, ErrUnknownFunction)
-									} else {
-										pass.Add(1)
-									}
-								default:
-									t.Errorf("unhandled error from expression %q in compliance test file %s: %s", test.Expression, name, test.Error)
-								}
+								pass.Add(1)
 							}
 						} else {
 							if err != nil {
@@ -125,7 +88,42 @@ func complianceTest(t *testing.T, dir string) {
 							} else if !resultEqual(test.Result, result) {
 								t.Errorf("incorrect result %v from expression %q in compliance test file %s, expected %v", result, test.Expression, name, test.Result)
 							} else {
-								pass.Add(1)
+								resultTypes, err := ResultTypes(test.Expression)
+								if err != nil {
+									t.Errorf("unexpected error %v from expression %q in compliance test file %s", err, test.Expression, name)
+								} else if !resultTypeEqual(resultTypes, test.Result) {
+									t.Errorf("incorrect result type from expression %q in compliance test file %s; expected %v", test.Expression, name, resultTypes)
+								} else {
+									pass.Add(1)
+								}
+							}
+						}
+
+						expr, err := Compile(test.Expression)
+						if err != nil {
+							if test.Error == "" {
+								t.Errorf("unexpected error %v from expression %q in compliance test file %s", err, test.Expression, name)
+							} else if !errorEqual(test.Error, err) {
+								t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected: %s", err, test.Expression, name, test.Error)
+							}
+						} else {
+							result, err = expr.Search(cases.Given)
+							if test.Error != "" {
+								if err == nil {
+									t.Errorf("expected error %s from expression %q in compliance test file %s", test.Error, test.Expression, name)
+								} else if !errorEqual(test.Error, err) {
+									t.Errorf("incorrect error %v from expression %q in compliance test file %s, expected: %s", err, test.Expression, name, test.Error)
+								}
+							} else {
+								if err != nil {
+									t.Errorf("unexpected error %v from expression %q in compliance test file %s", err, test.Expression, name)
+								} else if !resultEqual(test.Result, result) {
+									t.Errorf("incorrect result %v from expression %q in compliance test file %s, expected %v", result, test.Expression, name, test.Result)
+								}
+							}
+
+							if resultTypes := expr.ResultTypes(); !resultTypeEqual(resultTypes, test.Result) {
+								t.Errorf("incorrect result type from expression %q in compliance test file %s; expected %v", test.Expression, name, resultTypes)
 							}
 						}
 					}
@@ -135,6 +133,25 @@ func complianceTest(t *testing.T, dir string) {
 	})
 
 	t.Logf("%d/%d passed", pass.Load(), total.Load())
+}
+
+func errorEqual(x string, y error) bool {
+	switch x {
+	case "invalid-arity":
+		return errors.Is(y, ErrInvalidArity)
+	case "invalid-type":
+		return errors.Is(y, ErrInvalidType)
+	case "invalid-value":
+		return errors.Is(y, ErrInvalidValue)
+	case "syntax":
+		return errors.Is(y, ErrSyntax)
+	case "undefined-variable":
+		return errors.Is(y, ErrUndefinedVariable)
+	case "unknown-function":
+		return errors.Is(y, ErrUnknownFunction)
+	default:
+		return false
+	}
 }
 
 func resultEqual(x, y any) bool {
@@ -177,8 +194,6 @@ func resultEqual(x, y any) bool {
 		}
 
 		return true
-	case nil:
-		return y == nil
 	case bool:
 		y, ok := y.(bool)
 		if !ok {
@@ -210,7 +225,28 @@ func resultEqual(x, y any) bool {
 		default:
 			return false
 		}
+	case nil:
+		return y == nil
 	}
 
 	panic(fmt.Sprintf("unhandled type %T", x))
+}
+
+func resultTypeEqual(x Types, y any) bool {
+	switch y := y.(type) {
+	case []any:
+		return x&TypeArray != 0
+	case map[string]any:
+		return x&TypeObject != 0
+	case bool:
+		return x&TypeBoolean != 0
+	case string:
+		return x&TypeString != 0
+	case json.Number:
+		return x&TypeNumber != 0
+	case nil:
+		return true
+	default:
+		panic(fmt.Sprintf("unhandled type %T", y))
+	}
 }

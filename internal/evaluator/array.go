@@ -613,7 +613,7 @@ func pruneArray(v any) any {
 		return r
 	}
 
-	return a
+	return v
 }
 
 func sortArray(v any) (any, error) {

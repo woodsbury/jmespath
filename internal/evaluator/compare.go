@@ -36,8 +36,6 @@ func contains(x, y any) (bool, error) {
 
 func equal(x, y any) bool {
 	switch x := x.(type) {
-	case nil:
-		return y == nil
 	case bool:
 		if y, ok := y.(bool); ok {
 			return x == y
@@ -50,6 +48,8 @@ func equal(x, y any) bool {
 		}
 
 		return false
+	case nil:
+		return y == nil
 	}
 
 	xd, ok := toDecimal(x)
@@ -132,8 +132,6 @@ func greaterOrEqual(x, y any) any {
 
 func isTrue(v any) bool {
 	switch v := v.(type) {
-	case nil:
-		return false
 	case []any:
 		return len(v) > 0
 	case map[string]any:
@@ -158,6 +156,8 @@ func isTrue(v any) bool {
 		return len(v) > 0
 	case json.Number:
 		return len(v) > 0
+	case nil:
+		return false
 	}
 
 	return true
